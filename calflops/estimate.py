@@ -115,7 +115,7 @@ def create_empty_model(
             raise ValueError(
                 f"Model `{model_name}` does not have any library metadata on the Hub, please manually pass in a `--library_name` to use (such as `transformers`)"
             )
-    if library_name == "transformers":
+    if library_name == "transformers" or library_name == 'sentence-transformers':
         if not is_transformers_available():
             raise ImportError(
                 f"To check `{model_name}`, `transformers` must be installed. Please install it via `pip install transformers`"
@@ -147,11 +147,11 @@ def create_empty_model(
         print(f"Loading pretrained config for `{model_name}` from `timm`...")
         with init_empty_weights():
             model = timm.create_model(model_name, pretrained=False)
-    elif library_name == "sentence-transformers":
-        # if is_sentence_transformers_available():
-        from sentence_transformers import SentenceTransformer
-
-        model = SentenceTransformer(model_name, trust_remote_code=True)
+    # elif library_name == "sentence-transformers":
+    #     # if is_sentence_transformers_available():
+    #     from sentence_transformers import SentenceTransformer
+    #
+    #     model = SentenceTransformer(model_name, trust_remote_code=True)
     else:
         raise ValueError(
             f"Library `{library_name}` is not supported yet, please open an issue on GitHub for us to add support."

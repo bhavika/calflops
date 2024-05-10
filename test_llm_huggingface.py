@@ -22,7 +22,8 @@ max_seq_length = 128
 # print("%s FLOPs:%s  MACs:%s  Params:%s \n" %(model_name, flops, macs, params))
 
 
-model_name = "nomic-ai/nomic-embed-text-v1.5"
+# model_name = "nomic-ai/nomic-embed-text-v1.5"
+model_name = "BAAI/bge-m3"
 flops, macs, params, print_results = calculate_flops_hf(model_name=model_name,
                                                         input_shape=(batch_size, max_seq_length),
                                                         forward_mode="forward",

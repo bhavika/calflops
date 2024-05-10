@@ -117,9 +117,6 @@ def calculate_flops_hf(
     for key, value in kwargs.items():
         kwargs[key] = value.to(device)
 
-    print("Passing these kwargs to forward pass")
-    print(kwargs)
-
     try:
         if forward_mode == "forward":
             _ = empty_model(**kwargs)
