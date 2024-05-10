@@ -15,7 +15,7 @@
 import torch
 import torch.nn as nn
 
-from .calculate_pipline import CalFlopsPipline
+from .calculate_pipeline import CalFlopsPipline
 from .utils import flops_to_string
 from .utils import generate_transformer_input
 from .utils import macs_to_string

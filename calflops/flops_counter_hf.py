@@ -22,7 +22,7 @@ from .utils import flops_to_string
 from .utils import macs_to_string
 from .utils import params_to_string
 from .estimate import create_empty_model
-from .calculate_pipline import CalFlopsPipline
+from .calculate_pipeline import CalFlopsPipline
 
 
 def calculate_flops_hf(
