@@ -17,10 +17,12 @@ import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
 
-from .utils import generate_transformer_input
-from .utils import flops_to_string
-from .utils import macs_to_string
-from .utils import params_to_string
+from .utils import (
+    generate_transformer_input,
+    flops_to_string,
+    macs_to_string,
+    params_to_string,
+)
 from .estimate import create_empty_model
 from .calculate_pipeline import CalFlopsPipline
 
@@ -32,7 +34,7 @@ def calculate_flops_hf(
     trust_remote_code=True,
     access_token="",
     forward_mode="forward",
-    include_backPropagation=False,
+    include_backpropagation=False,
     compute_bp_factor=2.0,
     print_results=True,
     print_detailed=True,
@@ -89,16 +91,15 @@ def calculate_flops_hf(
     assert isinstance(empty_model, nn.Module), "model must be a PyTorch module"
     device = next(empty_model.parameters()).device
     empty_model = empty_model.to(device)
-    print(empty_model)
     empty_model.eval()
 
-    calculate_flops_pipline = CalFlopsPipline(
+    calculate_flops_pipeline = CalFlopsPipline(
         model=empty_model,
-        include_backPropagation=include_backPropagation,
+        include_backpropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
         is_sparse=False,
     )
-    calculate_flops_pipline.start_flops_calculate(ignore_list=ignore_modules)
+    calculate_flops_pipeline.start_flops_calculate(ignore_list=ignore_modules)
 
     if input_shape is not None:
         assert type(input_shape) is tuple, "input_shape must be a tuple"
@@ -134,20 +135,20 @@ def calculate_flops_hf(
         print(ErrorInformation)
         return None, None, None
     else:
-        flops = calculate_flops_pipline.get_total_flops()
-        macs = calculate_flops_pipline.get_total_macs()
-        params = calculate_flops_pipline.get_total_params()
+        flops = calculate_flops_pipeline.get_total_flops()
+        macs = calculate_flops_pipeline.get_total_macs()
+        params = calculate_flops_pipeline.get_total_params()
 
-        print_return = calculate_flops_pipline.print_return_model_pipline(
+        print_return = calculate_flops_pipeline.print_return_model_pipline(
             units=output_unit,
             precision=output_precision,
             print_detailed=print_detailed,
             print_results=print_results,
         )
 
-        calculate_flops_pipline.end_flops_calculate()
+        calculate_flops_pipeline.end_flops_calculate()
 
-        if include_backPropagation:
+        if include_backpropagation:
             flops = flops * (1 + compute_bp_factor)
             macs = macs * (1 + compute_bp_factor)
 

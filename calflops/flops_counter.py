@@ -29,7 +29,7 @@ def calculate_flops(
     args=[],
     kwargs={},
     forward_mode="forward",
-    include_backPropagation=False,
+    include_backpropagation=False,
     compute_bp_factor=2.0,
     print_results=True,
     print_detailed=True,
@@ -48,7 +48,7 @@ def calculate_flops(
         args (list, optional): list of positional arguments to the model, such as bert input args is [input_ids, token_type_ids, attention_mask]. Default to []
         kwargs (dict, optional): dictionary of keyword arguments to the model, such as bert input kwargs is {'input_ids': ..., 'token_type_ids':..., 'attention_mask':...}. Default to {}
         forward_mode (str, optional): To determine the mode of model inference, Default to 'forward'. And use 'generate' if model inference uses model.generate().
-        include_backPropagation (bool, optional): Decides whether the final return FLOPs computation includes the computation for backpropagation.
+        include_backpropagation (bool, optional): Decides whether the final return FLOPs computation includes the computation for backpropagation.
         compute_bp_factor (float, optional): The model backpropagation is a multiple of the forward propagation computation. Default to 2.
         print_results (bool, optional): Whether to print the model profile. Defaults to True.
         print_detailed (bool, optional): Whether to print the detailed model profile. Defaults to True.
@@ -116,7 +116,7 @@ def calculate_flops(
 
     calculate_flops_pipline = CalFlopsPipline(
         model=model,
-        include_backPropagation=include_backPropagation,
+        include_backPropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
         is_sparse=is_sparse,
     )

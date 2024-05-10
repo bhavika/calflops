@@ -42,7 +42,7 @@ class CalFlopsPipline(object):
     It can easily get only final resulst of FLOPs about model, and also can be showed how flops and parameters are spent in the model and which modules or layers could be the bottleneck in detailed.
     """
 
-    def __init__(self, model, include_backPropagation, compute_bp_factor, is_sparse):
+    def __init__(self, model, include_backpropagation, compute_bp_factor, is_sparse):
         """Init Pipline of Calculating the FLOPs about model.
 
         Args:
@@ -65,7 +65,7 @@ class CalFlopsPipline(object):
         Extra attributes are added recursively to all the modules and the calculate torch.nn.functionals are monkey patched.
 
         Args:
-            ignore_list (list, optional): the list of modules to ignore while Piplining. Defaults to None.
+            ignore_list (list, optional): the list of modules to ignore while pipelining. Defaults to None.
         """
 
         self.reset_flops_calculate()

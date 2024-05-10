@@ -115,7 +115,7 @@ def create_empty_model(
             raise ValueError(
                 f"Model `{model_name}` does not have any library metadata on the Hub, please manually pass in a `--library_name` to use (such as `transformers`)"
             )
-    if library_name == "transformers" or library_name == 'sentence-transformers':
+    if library_name == "transformers" or library_name == "sentence-transformers":
         if not is_transformers_available():
             raise ImportError(
                 f"To check `{model_name}`, `transformers` must be installed. Please install it via `pip install transformers`"
