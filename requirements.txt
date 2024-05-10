@@ -5,3 +5,5 @@ numpy
 sentence-transformers
 einops
 bitsandbytes
+black
+ruff

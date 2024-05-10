@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#import argparse
+# import argparse
 
 from huggingface_hub import model_info
 from huggingface_hub.utils import GatedRepoError, RepositoryNotFoundError
@@ -34,11 +34,13 @@ if is_transformers_available():
 if is_timm_available():
     import timm
 
+
 def is_sentence_transformers_available():
     try:
         from sentence_transformers import SentenceTransformer
     except ImportError:
         return False
+
 
 def verify_on_hub(repo: str, token: str = None):
     "Verifies that the model is on the hub and returns the model info."
@@ -54,7 +56,11 @@ def check_has_model(error):
     """
     Checks what library spawned `error` when a model is not found
     """
-    if is_timm_available() and isinstance(error, RuntimeError) and "Unknown model" in error.args[0]:
+    if (
+        is_timm_available()
+        and isinstance(error, RuntimeError)
+        and "Unknown model" in error.args[0]
+    ):
         return "timm"
     elif (
         is_transformers_available()
@@ -66,7 +72,12 @@ def check_has_model(error):
         return "unknown"
 
 
-def create_empty_model(model_name: str, library_name: str, trust_remote_code: bool = False, access_token: str = None):
+def create_empty_model(
+    model_name: str,
+    library_name: str,
+    trust_remote_code: bool = False,
+    access_token: str = None,
+):
     """
     Creates an empty model from its parent library on the `Hub` to calculate the overall memory consumption.
 
@@ -112,7 +123,9 @@ def create_empty_model(model_name: str, library_name: str, trust_remote_code: bo
         print(f"Loading pretrained config for `{model_name}` from `transformers`...")
 
         auto_map = model_info.config.get("auto_map", False)
-        config = AutoConfig.from_pretrained(model_name, trust_remote_code=trust_remote_code)
+        config = AutoConfig.from_pretrained(
+            model_name, trust_remote_code=trust_remote_code
+        )
 
         with init_empty_weights():
             # remote code could specify a specific `AutoModel` class in the `auto_map`
@@ -134,9 +147,10 @@ def create_empty_model(model_name: str, library_name: str, trust_remote_code: bo
         print(f"Loading pretrained config for `{model_name}` from `timm`...")
         with init_empty_weights():
             model = timm.create_model(model_name, pretrained=False)
-    elif library_name == 'sentence-transformers':
+    elif library_name == "sentence-transformers":
         # if is_sentence_transformers_available():
         from sentence_transformers import SentenceTransformer
+
         model = SentenceTransformer(model_name, trust_remote_code=True)
     else:
         raise ValueError(
