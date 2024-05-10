@@ -1,0 +1,7 @@
+accelerate
+transformers
+torch
+numpy
+sentence-transformers
+einops
+bitsandbytes

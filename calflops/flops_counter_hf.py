@@ -73,7 +73,7 @@ def calculate_flops_hf(model_name,
         The number of floating-point operations, multiply-accumulate operations (MACs), and parameters in the model.
     """
     
-    if empty_model == None:
+    if empty_model is None:
         empty_model = create_empty_model(model_name=model_name,
                                          library_name=None,
                                          trust_remote_code=trust_remote_code,
@@ -90,7 +90,8 @@ def calculate_flops_hf(model_name,
     
     calculate_flops_pipline = CalFlopsPipline(model=empty_model,
                                               include_backPropagation=include_backPropagation,
-                                              compute_bp_factor=compute_bp_factor)
+                                              compute_bp_factor=compute_bp_factor,
+                                              is_sparse=False)
     calculate_flops_pipline.start_flops_calculate(ignore_list=ignore_modules)
 
     if input_shape is not None:

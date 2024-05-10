@@ -34,6 +34,11 @@ if is_transformers_available():
 if is_timm_available():
     import timm
 
+def is_sentence_transformers_available():
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ImportError:
+        return False
 
 def verify_on_hub(repo: str, token: str = None):
     "Verifies that the model is on the hub and returns the model info."
@@ -129,6 +134,10 @@ def create_empty_model(model_name: str, library_name: str, trust_remote_code: bo
         print(f"Loading pretrained config for `{model_name}` from `timm`...")
         with init_empty_weights():
             model = timm.create_model(model_name, pretrained=False)
+    elif library_name == 'sentence-transformers':
+        # if is_sentence_transformers_available():
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer(model_name, trust_remote_code=True)
     else:
         raise ValueError(
             f"Library `{library_name}` is not supported yet, please open an issue on GitHub for us to add support."
