@@ -104,7 +104,7 @@ def generate_transformer_input(model_tokenizer, input_shape, device):
     """
 
     if input_shape is None:
-        input_shape = [1, 128]  # defautl (batch_size=1, seq_len=128)
+        input_shape = [1, 128]  # default (batch_size=1, seq_len=128)
 
     max_length = input_shape[1]
     model_input_ids = []

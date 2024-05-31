@@ -16,10 +16,7 @@ import torch
 import torch.nn as nn
 
 from .calculate_pipeline import CalFlopsPipline
-from .utils import flops_to_string
-from .utils import generate_transformer_input
-from .utils import macs_to_string
-from .utils import params_to_string
+from .utils import flops_to_string, generate_transformer_input, macs_to_string, params_to_string
 
 
 def calculate_flops(
