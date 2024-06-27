@@ -10,7 +10,7 @@ authors = [
 description = "Calculate the number of FLOPs for any model"
 readme = "README.md"
 requires-python = ">=3.7"
-keywords = ["calflops", "ml", "gpu"]
+keywords = ["calflops", "ml", "gpu", "transformers", "deep learning"]
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -32,6 +32,9 @@ exclude = ["screenshot*"]
 
 [project.optional-dependencies]
 dev = ["pytest", "black"]
+
+[tool.ruff.per-file-ignores]
+"calflops/__init__.py" = ["F401"]
 
 [project.urls]
 "Homepage" = "https://github.com/bhavika/calflops"
