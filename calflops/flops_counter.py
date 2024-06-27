@@ -154,7 +154,7 @@ def calculate_flops(
     params = calculate_flops_pipeline.get_total_params()
 
     if print_results:
-        calculate_flops_pipeline.print_model_pipline(
+        calculate_flops_pipeline.print_model_pipeline(
             units=output_unit, precision=output_precision, print_detailed=print_detailed
         )
 

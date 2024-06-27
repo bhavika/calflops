@@ -18,8 +18,8 @@ from .utils import get_module_macs
 from .utils import macs_to_string
 from .utils import number_to_string
 from .utils import params_to_string
+from .constants import DEFAULT_PRECISION
 
-DEFAULT_PRECISION = 2
 module_flop_count = []
 module_mac_count = []
 old_functions = {}
@@ -32,34 +32,37 @@ class CalFlopsPipline(object):
     pass for a PyTorch model and prints the model \
     graph with the calculated static attached to each module.
     It can return either just the FLOPs for a model \
-    but also show where the FLOPs and parameters are used in the model,
+    or also show where the FLOPs and parameters are used in the model,
     and which modules or layers could be a bottleneck in detail.
     """
 
     def __init__(self, model, include_backpropagation, compute_bp_factor, is_sparse):
-        """Init Pipline of Calculating the FLOPs about model.
+        """Initial pipeline to calculate the FLOPs in a model.
 
         Args:
-            model (pytorch model): The model must be a pytorh model now.
-            compute_fwd_factor (float): Defaults to 2.0. According to https://epochai.org/blog/backward-forward-FLOP-ratio
+            model (pytorch model): This is a PyTorch model.
+            include_backpropagation (bool): Whether to include backprop \
+            in the calculation.
+            compute_bp_factor (float): Defaults to 2.0. According to https://epochai.org/blog/backward-forward-FLOP-ratio
+            is_sparse (bool): Whether to exclude sparse matrix flops.
         """
 
         self.model = model
         self.include_backpropagation = include_backpropagation
-        self.compute_bp_factor = compute_bp_factor  # usually 2.0
-        self.pipline_started = False
+        self.compute_bp_factor = compute_bp_factor
+        self.pipeline_started = False
         self.func_patched = False
         self.is_sparse = is_sparse  # Whether to exclude sparse matrix flops
 
     def start_flops_calculate(self, ignore_list=None):
-        """Starts the pipline of calculating FLOPs.
+        """Starts the pipeline for calculating FLOPs.
 
         Extra attributes are added recursively to all the \
-        modules and the calculate torch.nn.functionals are monkey patched.
+        modules and torch.nn.functional is monkey patched.
 
         Args:
             ignore_list (list, optional): the list of modules to \
-            ignore while pipelining. Defaults to None.
+            ignore while running the pipeline. Defaults to None.
         """
 
         self.reset_flops_calculate()
@@ -78,7 +81,7 @@ class CalFlopsPipline(object):
                     )
                 return
 
-            # if computing the flops of the functionals in a module
+            # if computing the flops of the functional in a module
             def pre_hook(module, input):
                 module_flop_count.append([])
                 module_mac_count.append([])
@@ -97,15 +100,15 @@ class CalFlopsPipline(object):
                 module.__post_hook_handle__ = module.register_forward_hook(post_hook)
 
         self.model.apply(partial(register_module_hooks, ignore_list=ignore_list))
-        self.pipline_started = True
+        self.pipeline_started = True
         self.func_patched = True
 
     def stop_flops_calculate(self):
-        """Stop the pipline of calculating FLOPs.
+        """Stop the pipeline calculating FLOPs.
 
-        All torch.nn.functionals are restored to their originals.
+        All torch.nn.functional are restored to their originals.
         """
-        if self.pipline_started and self.func_patched:
+        if self.pipeline_started and self.func_patched:
             _reload_functionals(old_functions)
             _reload_tensor_methods(old_functions)
             self.func_patched = False
@@ -124,9 +127,9 @@ class CalFlopsPipline(object):
         self.model.apply(remove_calculate_attrs)
 
     def reset_flops_calculate(self):
-        """Resets the pipline of calculating FLOPs.
+        """Resets the pipeline calculating FLOPs.
 
-        Adds or resets the extra attributes, include flops、macs、params.
+        Adds or resets the extra attributes, include flops, macs, params.
         """
 
         def add_or_reset_attrs(module):
@@ -141,19 +144,17 @@ class CalFlopsPipline(object):
                 if self.is_sparse
                 else sum(p.numel() for p in module.parameters() if p.requires_grad)
             )
-            # just calculate parameter need training.
 
         self.model.apply(add_or_reset_attrs)
 
     def end_flops_calculate(self):
-        """Ends the pipline of calculating FLOPs.
-
+        """Ends the pipeline.
         The added attributes and handles are removed recursively on all the modules.
         """
-        if not self.pipline_started:
+        if not self.pipeline_started:
             return
         self.stop_flops_calculate()
-        self.pipline_started = False
+        self.pipeline_started = False
 
         def remove_calculate_attrs(module):
             if hasattr(module, "__flops__"):
@@ -173,7 +174,7 @@ class CalFlopsPipline(object):
             as a string. Defaults to False.
 
         Returns:
-            The number of multiply-accumulate operations of the model forward pass.
+            The number of floating point operations of the model forward pass.
         """
         total_flops = get_module_flops(self.model, is_sparse=self.is_sparse)
         return number_to_string(total_flops) if as_string else total_flops
@@ -182,7 +183,7 @@ class CalFlopsPipline(object):
         """Returns the total MACs of the model.
 
         Args:
-            as_string (bool, optional): whether to output FLOPs as a string. \
+            as_string (bool, optional): whether to output MACs as a string. \
             Defaults to False.
 
         Returns:
@@ -196,8 +197,6 @@ class CalFlopsPipline(object):
 
         Args:
             as_string (bool, optional): whether to output parameters
-            as a string. Defaults to False.
-            is_sparse (bool, optional): whether to output parameters
             as a string. Defaults to False.
 
         Returns:
@@ -216,15 +215,14 @@ class CalFlopsPipline(object):
         """Prints the model graph with the calculateing pipline attached to each module.
 
         Args:
-            module_depth (int, optional): The depth of the model to which to print the \
-            aggregated module information. \
-            When set to -1, it prints information from the \
-            top to the innermost modules (the maximum depth).
-            top_modules (int, optional): Limits the aggregated profile output \
-            to the number of top modules specified.
-            print_detailed (bool, optional): Whether to print a detailed model profile.
+            units: The units to use for the output. \
+            precision (float, optional): The precision to use \
+            for floating point output
+            print_detailed (bool, optional): Whether to print a \
+            detailed model profile.
+            print_results (bool, optional): Whether to print results
         """
-        if not self.pipline_started:
+        if not self.pipeline_started:
             return
 
         total_flops = self.get_total_flops()
@@ -363,7 +361,7 @@ class CalFlopsPipline(object):
             return_print += line + "\n"
         return return_print
 
-    def print_model_pipline(
+    def print_model_pipeline(
         self, units=None, precision=DEFAULT_PRECISION, print_detailed=True
     ):
         """Prints the model graph with the calculateing pipline attached to each module.
@@ -378,7 +376,7 @@ class CalFlopsPipline(object):
             print_detailed (bool, optional): Whether to print a \
             detailed model profile.
         """
-        if not self.pipline_started:
+        if not self.pipeline_started:
             return
 
         total_flops = self.get_total_flops()
