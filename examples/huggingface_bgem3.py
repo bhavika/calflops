@@ -1,14 +1,6 @@
 # !usr/bin/env python
 # -*- coding:utf-8 -*-
 
-"""
- Description  : 
- Version      : 1.0
- Author       : Bhavika Tekwani
- Mail         : bhavicka.7992@gmail.com
- Github       : https://github.com/bhavika
-"""
-
 from calflops import calculate_flops_hf
 
 batch_size = 1
