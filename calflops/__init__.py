@@ -1,7 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
-
 from .flops_counter import calculate_flops
 from .flops_counter_hf import calculate_flops_hf
 

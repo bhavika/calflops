@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from huggingface_hub import model_info
 from huggingface_hub.utils import GatedRepoError, RepositoryNotFoundError
 
@@ -19,7 +17,7 @@ if is_timm_available():
 
 
 def verify_on_hub(repo: str, token: str = None):
-    """Verifies that the model is on the hub and returns model info."""
+    """Verifies that the model is on HF hub and returns model info."""
     try:
         return model_info(repo, token=token)
     except GatedRepoError:
@@ -77,7 +75,7 @@ def create_empty_model(
 
     """
     model_info = verify_on_hub(model_name, access_token)
-    # Simplified errors
+
     if model_info == "gated":
         raise GatedRepoError(
             f"Repo for model `{model_name}` is gated. "
@@ -98,6 +96,7 @@ def create_empty_model(
                 f"please manually pass in a `--library_name` to use."
             )
     if library_name == "transformers" or library_name == "sentence-transformers":
+        # TODO: include check for sentence-transformers
         if not is_transformers_available():
             raise ImportError(
                 f"To check `{model_name}`, `transformers` must be installed. "

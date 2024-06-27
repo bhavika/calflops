@@ -1,6 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
 import torch.nn as nn
 from transformers import AutoTokenizer
 
@@ -11,7 +8,8 @@ from .utils import (
     params_to_string,
 )
 from .estimate import create_empty_model
-from .calculate_pipeline import CalFlopsPipline
+from .calculate_pipeline import CalFlopsPipeline
+from constants import DEFAULT_PRECISION, FORWARD_MODE, GENERATE_MODE, BACKPROP_FACTOR
 
 
 def calculate_flops_hf(
@@ -19,14 +17,14 @@ def calculate_flops_hf(
     empty_model=None,
     input_shape=None,
     trust_remote_code=True,
-    access_token="",
-    forward_mode="forward",
+    access_token=None,
+    forward_mode=FORWARD_MODE,
     include_backpropagation=False,
-    compute_bp_factor=2.0,
+    compute_bp_factor=BACKPROP_FACTOR,
     print_results=True,
     print_detailed=True,
     output_as_string=True,
-    output_precision=2,
+    output_precision=DEFAULT_PRECISION,
     output_unit=None,
     ignore_modules=None,
     return_results=False,
@@ -60,6 +58,8 @@ def calculate_flops_hf(
         Default is None, that is the unit of the output decide on value.
         ignore_modules ([type], optional): the list of modules to \
         ignore during profiling. Defaults to None.
+        return_results (bool, optional): Whether to return the results. \
+        Defaults to False.
 
     Returns:
         The number of floating-point operations, \
@@ -83,12 +83,13 @@ def calculate_flops_hf(
     empty_model = empty_model.to(device)
     empty_model.eval()
 
-    calculate_flops_pipeline = CalFlopsPipline(
+    calculate_flops_pipeline = CalFlopsPipeline(
         model=empty_model,
         include_backpropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
         is_sparse=False,
     )
+
     calculate_flops_pipeline.start_flops_calculate(ignore_list=ignore_modules)
 
     if input_shape is not None:
@@ -110,23 +111,19 @@ def calculate_flops_hf(
         kwargs[key] = value.to(device)
 
     try:
-        if forward_mode == "forward":
+        if forward_mode == FORWARD_MODE:
             _ = empty_model(**kwargs)
-        if forward_mode == "generate":
+        if forward_mode == GENERATE_MODE:
             _ = empty_model.generate(**kwargs)
     except Exception as e:
-        error_info = """The model:%s encountered a problem in forwarding, 
-        perhaps because the model:%s cannot be deduced on meta device. 
+        error_info = f"""The model:{model_name} encountered a problem in forwarding, 
+        perhaps because the model cannot be deduced on meta device. 
         You can downloaded complete model parameters 
         locally from huggingface , \
         and then use the function:calflops.calculate_flops(model, tokenizer) \
-        to calculate FLOPs on the gpu device.\n
-        Error details: %s\n.
-        """ % (
-            model_name,
-            model_name,
-            e,
-        )
+        to calculate FLOPs on a GPU.\n
+        Error details: {e}\n.
+        """
         print(error_info)
         return None, None, None
     else:
@@ -134,7 +131,7 @@ def calculate_flops_hf(
         macs = calculate_flops_pipeline.get_total_macs()
         params = calculate_flops_pipeline.get_total_params()
 
-        print_return = calculate_flops_pipeline.print_return_model_pipline(
+        print_return = calculate_flops_pipeline.print_return_model_pipeline(
             units=output_unit,
             precision=output_precision,
             print_detailed=print_detailed,

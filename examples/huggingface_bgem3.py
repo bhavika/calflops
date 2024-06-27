@@ -1,6 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
 from calflops import calculate_flops_hf
 
 batch_size = 1
@@ -17,4 +14,4 @@ flops, macs, params, print_results = calculate_flops_hf(
 )
 
 print(print_results)
-print("%s FLOPs:%s  MACs:%s  Params:%s \n" % (model_name, flops, macs, params))
+print(f"{model_name} FLOPs:{flops}  MACs:{macs}  Params:{params}")
