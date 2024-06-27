@@ -10,7 +10,7 @@ style_check:
 
 style:
 	black .
-	ruff . --fix
+	ruff check . --fix
 
 build_dist:
 	rm -fr build

@@ -2,18 +2,7 @@
 # -*- coding:utf-8 -*-
 
 """
- Description  : 
- Version      : 1.0
- Author       : MrYXJ
- Mail         : yxj2017@gmail.com
- Github       : https://github.com/MrYxJ
- Date         : 2023-08-20 11:04:11
- LastEditTime : 2023-09-08 23:42:00
- Copyright (C) 2023 mryxj. All rights reserved.
-"""
-
-"""
-The part of code is inspired by ptflops and deepspeed profiling.
+This part of the code is inspired by ptflops and deepspeed profiling.
 """
 
 from functools import partial
@@ -37,9 +26,14 @@ old_functions = {}
 
 
 class CalFlopsPipline(object):
-    """The Pipline of calculating FLOPs（number of estimated floating-point operations） and Parameters of each module in a PyTorch model.
-    The pipline is calculating the forward(and alson include back propagation) pass of a PyTorch model and prints the model graph with the calculated static attached to each module.
-    It can easily get only final resulst of FLOPs about model, and also can be showed how flops and parameters are spent in the model and which modules or layers could be the bottleneck in detailed.
+    """This pipeline calculates FLOPs and the
+    number of parameters of each module in a PyTorch model.
+    It is calculating the forward (and can optionally include back propagation) \
+    pass for a PyTorch model and prints the model \
+    graph with the calculated static attached to each module.
+    It can return either just the FLOPs for a model \
+    but also show where the FLOPs and parameters are used in the model,
+    and which modules or layers could be a bottleneck in detail.
     """
 
     def __init__(self, model, include_backpropagation, compute_bp_factor, is_sparse):
@@ -51,21 +45,21 @@ class CalFlopsPipline(object):
         """
 
         self.model = model
-        self.include_backPropagation = include_backPropagation  # Whether the calculation results include model backpropagation
-        self.compute_bp_factor = compute_bp_factor  # Backpropagation takes twice as much computation as forward propagation
-        self.pipline_started = False  # The flag of calculating FLOPs pipline started
-        self.func_patched = (
-            False  # The flag of wheather calculating functional are patched
-        )
+        self.include_backpropagation = include_backpropagation
+        self.compute_bp_factor = compute_bp_factor  # usually 2.0
+        self.pipline_started = False
+        self.func_patched = False
         self.is_sparse = is_sparse  # Whether to exclude sparse matrix flops
 
     def start_flops_calculate(self, ignore_list=None):
         """Starts the pipline of calculating FLOPs.
 
-        Extra attributes are added recursively to all the modules and the calculate torch.nn.functionals are monkey patched.
+        Extra attributes are added recursively to all the \
+        modules and the calculate torch.nn.functionals are monkey patched.
 
         Args:
-            ignore_list (list, optional): the list of modules to ignore while pipelining. Defaults to None.
+            ignore_list (list, optional): the list of modules to \
+            ignore while pipelining. Defaults to None.
         """
 
         self.reset_flops_calculate()
@@ -175,7 +169,8 @@ class CalFlopsPipline(object):
         """Returns the total flops of the model.
 
         Args:
-            as_string (bool, optional): whether to output the flops as string. Defaults to False.
+            as_string (bool, optional): whether to output FLOPs
+            as a string. Defaults to False.
 
         Returns:
             The number of multiply-accumulate operations of the model forward pass.
@@ -187,7 +182,8 @@ class CalFlopsPipline(object):
         """Returns the total MACs of the model.
 
         Args:
-            as_string (bool, optional): whether to output the flops as string. Defaults to False.
+            as_string (bool, optional): whether to output FLOPs as a string. \
+            Defaults to False.
 
         Returns:
             The number of multiply-accumulate operations of the model forward pass.
@@ -199,8 +195,10 @@ class CalFlopsPipline(object):
         """Returns the total number of parameters stored per rank.
 
         Args:
-            as_string (bool, optional): whether to output the parameters as string. Defaults to False.
-            is_sparse (bool, optional): whether to output the parameters as string. Defaults to False.
+            as_string (bool, optional): whether to output parameters
+            as a string. Defaults to False.
+            is_sparse (bool, optional): whether to output parameters
+            as a string. Defaults to False.
 
         Returns:
             The total number of parameters stored per rank.
@@ -218,9 +216,13 @@ class CalFlopsPipline(object):
         """Prints the model graph with the calculateing pipline attached to each module.
 
         Args:
-            module_depth (int, optional): The depth of the model to which to print the aggregated module information. When set to -1, it prints information from the top to the innermost modules (the maximum depth).
-            top_modules (int, optional): Limits the aggregated profile output to the number of top modules specified.
-            print_detailed (bool, optional): Whether to print the detailed model profile.
+            module_depth (int, optional): The depth of the model to which to print the \
+            aggregated module information. \
+            When set to -1, it prints information from the \
+            top to the innermost modules (the maximum depth).
+            top_modules (int, optional): Limits the aggregated profile output \
+            to the number of top modules specified.
+            print_detailed (bool, optional): Whether to print a detailed model profile.
         """
         if not self.pipline_started:
             return
@@ -234,16 +236,18 @@ class CalFlopsPipline(object):
         self.params = total_params
 
         prints = []
-        prints.append(
-            "\n------------------------------------- Calculate Flops Results -------------------------------------"
-        )
+        prints.append("\n----------- Calculate Flops Results ----------------")
 
         prints.append(
             "Notations:\n"
-            + "number of parameters (Params), number of multiply-accumulate operations(MACs),\n"
-            + "number of floating-point operations (FLOPs), floating-point operations per second (FLOPS),\n"
-            + "fwd FLOPs (model forward propagation FLOPs), bwd FLOPs (model backward propagation FLOPs),\n"
-            + "default model backpropagation takes %.2f times as much computation as forward propagation.\n"
+            + "number of parameters (Params), \
+            number of multiply-accumulate operations(MACs),\n"
+            + "number of floating-point operations (FLOPs), \
+            floating-point operations per second (FLOPS),\n"
+            + "fwd FLOPs (model forward propagation FLOPs), \
+            bwd FLOPs (model backward propagation FLOPs),\n"
+            + "default model backpropagation takes %.2f times as \
+            much computation as forward propagation.\n"
             % self.compute_bp_factor
         )
 
@@ -325,14 +329,24 @@ class CalFlopsPipline(object):
         self.model.apply(add_extra_repr)
 
         if print_detailed:
+            prints.append("\n--------------- Detailed FLOPs Results ----------------")
             prints.append(
-                "\n-------------------------------- Detailed Calculated FLOPs Results --------------------------------"
+                "Each module calculated is listed after its name "
+                "in the following order: \n"
+                "params, percentage of total params, MACs, "
+                "percentage of total MACs, FLOPS, "
+                "percentage of total FLOPs"
             )
             prints.append(
-                "Each module caculated is listed after its name in the following order: \nparams, percentage of total params, MACs, percentage of total MACs, FLOPS, percentage of total FLOPs"
-            )
-            prints.append(
-                "\nNote: 1. A module can have torch.nn.module or torch.nn.functional to compute logits (e.g. CrossEntropyLoss). \n They are not counted as submodules in calflops and not to be printed out. However they make up the difference between a parent's MACs and the sum of its submodules'.\n2. Number of floating-point operations is a theoretical estimation, thus FLOPS computed using that could be larger than the maximum system throughput.\n"
+                "\nNote: 1. A module can have torch.nn.module or torch.nn.functional \
+                to compute logits (e.g. CrossEntropyLoss). \
+                \n They are not counted as submodules in \
+                calflops and not to be printed out. \
+                However they make up the difference between a parent's MACs \
+                and the sum of its submodules'.\
+                \n2. Number of floating-point operations is a theoretical estimation, \
+                thus FLOPS computed using that could be larger than "
+                "the maximum system throughput.\n"
             )
             prints.append(str(self.model))
 
@@ -355,9 +369,14 @@ class CalFlopsPipline(object):
         """Prints the model graph with the calculateing pipline attached to each module.
 
         Args:
-            module_depth (int, optional): The depth of the model to which to print the aggregated module information. When set to -1, it prints information from the top to the innermost modules (the maximum depth).
-            top_modules (int, optional): Limits the aggregated profile output to the number of top modules specified.
-            print_detailed (bool, optional): Whether to print the detailed model profile.
+            module_depth (int, optional): The depth of the model to \
+            which to print the aggregated module information. When set to -1, \
+            it prints information from the top to the \
+            innermost modules (the maximum depth).
+            top_modules (int, optional): Limits the aggregated \
+            profile output to the number of top modules specified.
+            print_detailed (bool, optional): Whether to print a \
+            detailed model profile.
         """
         if not self.pipline_started:
             return
@@ -370,16 +389,18 @@ class CalFlopsPipline(object):
         self.macs = total_macs
         self.params = total_params
 
-        print(
-            "\n------------------------------------- Calculate Flops Results -------------------------------------"
-        )
+        print("\n-------------- Flops Results -------------")
 
         print(
             "Notations:\n"
-            "number of parameters (Params), number of multiply-accumulate operations(MACs),\n"
-            "number of floating-point operations (FLOPs), floating-point operations per second (FLOPS),\n"
-            "fwd FLOPs (model forward propagation FLOPs), bwd FLOPs (model backward propagation FLOPs),\n"
-            "default model backpropagation takes %.2f times as much computation as forward propagation.\n"
+            "number of parameters (Params), \
+            number of multiply-accumulate operations(MACs),\n"
+            "number of floating-point operations (FLOPs), \
+            floating-point operations per second (FLOPS),\n"
+            "fwd FLOPs (model forward propagation FLOPs), \
+            bwd FLOPs (model backward propagation FLOPs),\n"
+            "default model backpropagation takes %.2f times \
+            as much computation as forward propagation.\n"
             % self.compute_bp_factor
         )
 
@@ -462,14 +483,23 @@ class CalFlopsPipline(object):
         self.model.apply(add_extra_repr)
 
         if print_detailed:
+            print("\n-------------- Detailed FLOPs Results ------------")
             print(
-                "\n-------------------------------- Detailed Calculated FLOPs Results --------------------------------"
+                "Each module calculated is listed after its name \
+                in the following order: "
+                "\nparams, percentage of total params, MACs, \
+                percentage of total MACs, FLOPS, percentage of total FLOPs"
             )
             print(
-                "Each module caculated is listed after its name in the following order: \nparams, percentage of total params, MACs, percentage of total MACs, FLOPS, percentage of total FLOPs"
-            )
-            print(
-                "\nNote: 1. A module can have torch.nn.module or torch.nn.functional to compute logits (e.g. CrossEntropyLoss). \n They are not counted as submodules in calflops and not to be printed out. However they make up the difference between a parent's MACs and the sum of its submodules'.\n2. Number of floating-point operations is a theoretical estimation, thus FLOPS computed using that could be larger than the maximum system throughput.\n"
+                "\nNote: 1. A module can have torch.nn.module or \
+                 torch.nn.functional to compute logits (e.g. CrossEntropyLoss). "
+                "They are not counted as submodules in calflops \
+                and not to be printed out. "
+                "However they make up the difference between a \
+                parent's MACs and the sum of its submodules'."
+                "\n2. Number of floating-point operations is a theoretical estimation, "
+                "thus FLOPS computed using that could be larger than the \
+                maximum system throughput.\n"
             )
             print(self.model)
 

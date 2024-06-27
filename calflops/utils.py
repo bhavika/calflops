@@ -1,33 +1,24 @@
 # !usr/bin/env python
 # -*- coding:utf-8 -*-
 
-"""
- Description  : 
- Version      : 1.0
- Author       : MrYXJ
- Mail         : yxj2017@gmail.com
- Github       : https://github.com/MrYxJ
- Date         : 2023-08-19 11:01:23
- LastEditTime : 2023-09-05 15:51:50
- Copyright (C) 2023 mryxj. All rights reserved.
-"""
-
 import importlib
-
 import torch
 
 DEFAULT_PRECISION = 2
 
 
 def generate_transformer_input(model_tokenizer, input_shape, device):
-    """Automatically generates data in the form of transformes model input format.
+    """Automatically generates data in the form of transformers model input format.
 
     Args:
+        model_tokenizer (transformer.model.tokenization)
         input_shape (tuple):transformers model input shape: (batch_size, seq_len).
-        tokenizer (transformer.model.tokenization): transformers model tokenization.tokenizer.
+        device
 
     Returns:
-        dict: data format of transformers model input, it is a dict contain 'input_ids', 'attention_mask', sometime contain 'token_type_ids'.
+        dict: data format of transformers model input, \
+        it is a dict contain 'input_ids',
+        'attention_mask', sometimes contains 'token_type_ids'.
     """
 
     if input_shape is None:
@@ -139,8 +130,10 @@ def macs_to_string(macs, units=None, precision=DEFAULT_PRECISION):
 
     Args:
         macs (int): Calculate the results of the model macs in numerical form.
-        units (str, optional): The unit of macs after conversion to string representation, such as TMACs、GMACs、MMACs、KMACs
-        precision (int, optional): The number of digits of the result is preserved. Defaults to DEFAULT_PRECISION.
+        units (str, optional): The unit of macs after \
+        conversion to string representation, such as TMACs、GMACs、MMACs、KMACs
+        precision (int, optional): The number of digits of the \
+        result is preserved. Defaults to DEFAULT_PRECISION.
 
     Returns:
         string: The string representation of macs.
@@ -153,8 +146,10 @@ def flops_to_string(flops, units=None, precision=DEFAULT_PRECISION):
 
     Args:
         flops (int): Calculate the results of the model flops in numerical form.
-        units (str, optional): The unit of flops after conversion to string representation, such as TFLOPs,GFLOPs,MFLOPs,KFLOPs.
-        precision (int, optional): The number of digits of the result is preserved. Defaults to DEFAULT_PRECISION.
+        units (str, optional): The unit of flops after \
+        conversion to string representation, such as TFLOPs, GFLOPs, MFLOPs, KFLOPs.
+        precision (int, optional): The number of digits of the result \
+        is preserved. Defaults to DEFAULT_PRECISION.
 
     Returns:
         string: The string representation of flops.
@@ -167,8 +162,10 @@ def bytes_to_string(b, units=None, precision=DEFAULT_PRECISION):
 
     Args:
         b (int): Calculate the results of the bytes in numerical form.
-        units (str, optional): The unit of bytes after conversion to string representation, such as TB,GB,MB,KB.
-        precision (int, optional): The number of digits of the result is preserved. Defaults to DEFAULT_PRECISION.
+        units (str, optional): The unit of bytes after \
+        converting to string representation, such as TB, GB, MB, KB.
+        precision (int, optional): The number of digits of \
+        the result is preserved. Defaults to DEFAULT_PRECISION.
 
     Returns:
         string: The string representation of bytes.
@@ -181,8 +178,10 @@ def params_to_string(params_num, units=None, precision=DEFAULT_PRECISION):
 
     Args:
         params_num (int): Calculate the results of the model param in numerical form.
-        units (str, optional): The unit of params after conversion to string representation.
-        precision (int, optional): The number of digits of the result is preserved. Defaults to DEFAULT_PRECISION.
+        units (str, optional): The unit of params after \
+        conversion to string representation.
+        precision (int, optional): The number of digits of the result \
+         is preserved. Defaults to DEFAULT_PRECISION.
 
     Returns:
         string: The string representation of params.
@@ -252,7 +251,9 @@ def convert_bytes(size):
 
 
 def _is_package_available(pkg_name):
-    # Check we're not importing a "pkg_name" directory somewhere but the actual library by trying to grab the version
+    # Check we're not importing a "pkg_name" \
+    # directory but the actual library by
+    # trying to grab the version
     package_exists = importlib.util.find_spec(pkg_name) is not None
     if package_exists:
         try:

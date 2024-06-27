@@ -1,18 +1,6 @@
 # !usr/bin/env python
 # -*- coding:utf-8 -*-
 
-"""
- Description  : 
- Version      : 1.0
- Author       : MrYXJ
- Mail         : yxj2017@gmail.com
- Github       : https://github.com/MrYxJ
- Date         : 2023-09-03 11:03:58
- LastEditTime : 2023-09-09 15:17:53
- Copyright (C) 2023 mryxj. All rights reserved.
-"""
-
-
 import torch.nn as nn
 from transformers import AutoTokenizer
 
@@ -46,33 +34,36 @@ def calculate_flops_hf(
     """Returns the total floating-point operations, MACs, and parameters of a model.
 
     Args:
-        model_name (str): The model name in huggingface platform https://huggingface.co/models, such as meta-llama/Llama-2-7b、baichuan-inc/Baichuan-13B-Chat etc.
-        input_shape (tuple, optional): Input shape to the model. If args and kwargs is empty, the model takes a tensor with this shape as the only positional argument. Default to [].
-        trust_remote_code (bool, optional): Trust the code in the remote library for the model structure.
-        access_token (str, optional): Some models need to apply for a access token, such as meta llama2 etc.
-        forward_mode (str, optional): To determine the mode of model inference, Default to 'forward'. And use 'generate' if model inference uses model.generate().
-        include_backPropagation (bool, optional): Decides whether the final return FLOPs computation includes the computation for backpropagation.
-        compute_bp_factor (float, optional): The model backpropagation is a multiple of the forward propagation computation. Default to 2.
-        print_results (bool, optional): Whether to print the model profile. Defaults to True.
-        print_detailed (bool, optional): Whether to print the detailed model profile. Defaults to True.
-        output_as_string (bool, optional): Whether to print the output as string. Defaults to True.
-        output_precision (int, optional) : Output holds the number of decimal places if output_as_string is True. Default to 2.
-        output_unit (str, optional): The unit used to output the result value, such as T, G, M, and K. Default is None, that is the unit of the output decide on value.
-        ignore_modules ([type], optional): the list of modules to ignore during profiling. Defaults to None.
-
-    Example:
-    .. code-block:: python
-    from calflops import calculate_flops_hf
-
-    batch_size = 1
-    max_seq_length = 128
-    model_name = "baichuan-inc/Baichuan-13B-Chat"
-    flops, macs, params = calculate_flops_hf(model_name=model_name,
-                                            input_shape=(batch_size, max_seq_length))
-    print("%s FLOPs:%s  MACs:%s  Params:%s \n" %(model_name, flops, macs, params))
+        model_name (str): The model name on HuggingFace, \
+        for example, meta-llama/Llama-2-7, baichuan-inc/Baichuan-13B-Chat etc.
+        input_shape (tuple, optional): Input shape to the model. \
+        If args|kwargs is empty, the model takes a tensor with \
+        this shape as the only positional argument. Default to [].
+        trust_remote_code (bool, optional): Required for custom models on HuggingFace.
+        access_token (str, optional): HuggingFace access token for private/gated models.
+        forward_mode (str, optional): To determine the mode of model inference,
+        Defaults to 'forward'. Use 'generate' if model inference uses model.generate().
+        include_backpropagation (bool, optional): Decides whether the final FLOPs \
+        computation includes the computation for backpropagation.
+        compute_bp_factor (float, optional): The model backpropagation is a \
+        multiple of the forward propagation computation. Defaults to 2.
+        print_results (bool, optional): Whether to print the model profile. \
+        Defaults to True.
+        print_detailed (bool, optional): Whether to print the detailed model profile. \
+        Defaults to True.
+        output_as_string (bool, optional): Whether to print the output as string. \
+        Defaults to True.
+        output_precision (int, optional) : Output holds the number of \
+        decimal places if output_as_string is True. Default to 2.
+        output_unit (str, optional): The unit used to output the result value, \
+        such as T, G, M, and K. \
+        Default is None, that is the unit of the output decide on value.
+        ignore_modules ([type], optional): the list of modules to \
+        ignore during profiling. Defaults to None.
 
     Returns:
-        The number of floating-point operations, multiply-accumulate operations (MACs), and parameters in the model.
+        The number of floating-point operations, \
+        multiply-accumulate operations (MACs), and parameters in the model.
     """
 
     if empty_model is None:
@@ -105,7 +96,8 @@ def calculate_flops_hf(
         assert len(input_shape) >= 1, "input_shape must have at least one element"
         assert (
             len(input_shape) == 2
-        ), "the format of input_shape must be (batch_size, seq_len) if model is transformers model and auto_generate_transformers_input if True"
+        ), "the format of input_shape must be (batch_size, seq_len) \
+        if model is transformers model and auto_generate_transformers_input if True"
         kwargs = generate_transformer_input(
             input_shape=input_shape, model_tokenizer=tokenizer, device=device
         )
@@ -123,15 +115,19 @@ def calculate_flops_hf(
         if forward_mode == "generate":
             _ = empty_model.generate(**kwargs)
     except Exception as e:
-        ErrorInformation = """The model:%s meet a problem in forwarding, perhaps because the model:%s cannot be deduced on meta device. 
-        You can downloaded complete model parameters in locally from huggingface platform, and then using another function:calflops.calculate_flops(model, tokenizer) to calculate FLOPs on the gpu device.\n
-        Error Information: %s\n.
+        error_info = """The model:%s encountered a problem in forwarding, 
+        perhaps because the model:%s cannot be deduced on meta device. 
+        You can downloaded complete model parameters 
+        locally from huggingface , \
+        and then use the function:calflops.calculate_flops(model, tokenizer) \
+        to calculate FLOPs on the gpu device.\n
+        Error details: %s\n.
         """ % (
             model_name,
             model_name,
             e,
         )
-        print(ErrorInformation)
+        print(error_info)
         return None, None, None
     else:
         flops = calculate_flops_pipeline.get_total_flops()
