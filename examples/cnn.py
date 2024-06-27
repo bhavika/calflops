@@ -1,6 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
 from calflops import calculate_flops
 from torchvision import models
 
