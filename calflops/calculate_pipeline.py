@@ -25,7 +25,7 @@ module_mac_count = []
 old_functions = {}
 
 
-class CalFlopsPipeline(object):
+class CalFlopsPipline(object):
     """This pipeline calculates FLOPs and the
     number of parameters of each module in a PyTorch model.
     It is calculating the forward (and can optionally include back propagation) \
