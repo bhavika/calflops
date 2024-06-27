@@ -16,7 +16,12 @@ import torch
 import torch.nn as nn
 
 from .calculate_pipeline import CalFlopsPipline
-from .utils import flops_to_string, generate_transformer_input, macs_to_string, params_to_string
+from .utils import (
+    flops_to_string,
+    generate_transformer_input,
+    macs_to_string,
+    params_to_string,
+)
 
 
 def calculate_flops(
@@ -154,7 +159,7 @@ def calculate_flops(
     else:
         assert transformer_tokenizer or (
             len(args) > 0 or len(kwargs) > 0
-        ), "input_shape or args or kwargs one of there parameters must specified if auto_generate_input is False"
+        ), "one of input_shape, args or kwargs parameters must specified if auto_generate_input is False"
         if transformer_tokenizer:
             kwargs = generate_transformer_input(
                 input_shape=None, model_tokenizer=transformer_tokenizer, device=device
@@ -181,7 +186,7 @@ def calculate_flops(
     params = calculate_flops_pipline.get_total_params()
 
     if print_results:
-        return_print = calculate_flops_pipline.print_model_pipline(
+        calculate_flops_pipline.print_model_pipline(
             units=output_unit, precision=output_precision, print_detailed=print_detailed
         )
 
