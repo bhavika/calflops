@@ -1,21 +1,6 @@
 # !usr/bin/env python
 # -*- coding:utf-8 -*-
 
-"""
- Description  : 
- Version      : 1.0
- Author       : MrYXJ
- Mail         : yxj2017@gmail.com
- Github       : https://github.com/MrYxJ
- Date         : 2023-08-19 22:34:47
- LastEditTime : 2023-08-23 11:17:33
- Copyright (C) 2023 mryxj. All rights reserved.
-"""
-
-"""
-The part of code is inspired by ptflops and deepspeed profiling.
-"""
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -730,10 +715,6 @@ def _patch_tensor_methods(old_functions, module_flop_count, module_mac_count):
         module_flop_count,
         module_mac_count,
     )
-    # torch.mm = wrapFunc(torch.mm, _matmul_flops_compute, old_functions, module_flop_count, module_mac_count)
-    # torch.Tensor.mm = wrapFunc(torch.Tensor.mm, _matmul_flops_compute, old_functions, module_flop_count, module_mac_count)
-    # torch.bmm = wrapFunc(torch.bmm, _matmul_flops_compute, old_functions, module_flop_count, module_mac_count)
-    # torch.Tensor.bmm = wrapFunc(torch.Tensor.bmm, _matmul_flops_compute, old_functions, module_flop_count, module_mac_count)
 
     torch.addmm = wrapFunc(
         torch.addmm,

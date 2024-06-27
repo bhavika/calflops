@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "calflops"
+authors = [
+    {name = "Bhavika Tekwani", email = "bhavicka.7992@gmail.com"},
+]
+description = "Calculate the number of FLOPs for any model"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["calflops", "ml", "gpu", "transformers", "deep learning"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.in"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["calflops"]
+exclude = ["screenshot*"]
+
+
+[project.optional-dependencies]
+dev = ["pytest", "black"]
+
+[tool.ruff.per-file-ignores]
+"calflops/__init__.py" = ["F401"]
+
+[project.urls]
+"Homepage" = "https://github.com/bhavika/calflops"
+"Bug Tracker" = "https://github.com/bhavika/calflops/issues"
