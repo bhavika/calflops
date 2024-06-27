@@ -80,7 +80,7 @@ def calculate_flops(
 
     is_transformer = True if "transformers" in str(type(model)) else False
 
-    calculate_flops_pipeline = CalFlopsPipline(
+    calculate_flops_pipeline = CalFlopsPipeline(
         model=model,
         include_backpropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
