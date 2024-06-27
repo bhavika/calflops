@@ -202,14 +202,14 @@ class CalFlopsPipeline(object):
         total_params = self.model.__params__
         return params_to_string(total_params) if as_string else total_params
 
-    def print_return_model_pipline(
+    def print_return_model_pipeline(
         self,
         units=None,
         precision=DEFAULT_PRECISION,
         print_detailed=True,
         print_results=True,
     ):
-        """Prints the model graph with the calculateing pipline attached to each module.
+        """Prints the model graph with the calculation pipeline attached to each module.
 
         Args:
             units: The units to use for the output. \
@@ -361,17 +361,12 @@ class CalFlopsPipeline(object):
     def print_model_pipeline(
         self, units=None, precision=DEFAULT_PRECISION, print_detailed=True
     ):
-        """Prints the model graph with the calculateing pipline attached to each module.
+        """Prints the model graph with the calculation pipeline attached to each module.
 
         Args:
-            module_depth (int, optional): The depth of the model to \
-            which to print the aggregated module information. When set to -1, \
-            it prints information from the top to the \
-            innermost modules (the maximum depth).
-            top_modules (int, optional): Limits the aggregated \
-            profile output to the number of top modules specified.
-            print_detailed (bool, optional): Whether to print a \
-            detailed model profile.
+            units: The units to use for the output.
+            precision (float, optional): The precision to use for floating point output
+            print_detailed (bool, optional): Whether to print a detailed model profile.
         """
         if not self.pipeline_started:
             return
