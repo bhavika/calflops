@@ -11,7 +11,7 @@ from .utils import (
     params_to_string,
 )
 from .estimate import create_empty_model
-from .calculate_pipeline import CalFlopsPipline
+from .calculate_pipeline import CalFlopsPipeline
 
 
 def calculate_flops_hf(
@@ -83,12 +83,13 @@ def calculate_flops_hf(
     empty_model = empty_model.to(device)
     empty_model.eval()
 
-    calculate_flops_pipeline = CalFlopsPipline(
+    calculate_flops_pipeline = CalFlopsPipeline(
         model=empty_model,
         include_backpropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
         is_sparse=False,
     )
+
     calculate_flops_pipeline.start_flops_calculate(ignore_list=ignore_modules)
 
     if input_shape is not None:

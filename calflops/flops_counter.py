@@ -4,7 +4,7 @@
 import torch
 import torch.nn as nn
 
-from .calculate_pipeline import CalFlopsPipline
+from .calculate_pipeline import CalFlopsPipeline
 from .utils import (
     flops_to_string,
     generate_transformer_input,
