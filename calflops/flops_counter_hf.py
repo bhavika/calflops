@@ -134,7 +134,7 @@ def calculate_flops_hf(
         macs = calculate_flops_pipeline.get_total_macs()
         params = calculate_flops_pipeline.get_total_params()
 
-        print_return = calculate_flops_pipeline.print_return_model_pipline(
+        print_return = calculate_flops_pipeline.print_return_model_pipeline(
             units=output_unit,
             precision=output_precision,
             print_detailed=print_detailed,
