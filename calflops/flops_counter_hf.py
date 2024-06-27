@@ -12,6 +12,7 @@ from .utils import (
 )
 from .estimate import create_empty_model
 from .calculate_pipeline import CalFlopsPipeline
+from constants import DEFAULT_PRECISION, FORWARD_MODE, GENERATE_MODE, BACKPROP_FACTOR
 
 
 def calculate_flops_hf(
@@ -19,14 +20,14 @@ def calculate_flops_hf(
     empty_model=None,
     input_shape=None,
     trust_remote_code=True,
-    access_token="",
-    forward_mode="forward",
+    access_token=None,
+    forward_mode=FORWARD_MODE,
     include_backpropagation=False,
-    compute_bp_factor=2.0,
+    compute_bp_factor=BACKPROP_FACTOR,
     print_results=True,
     print_detailed=True,
     output_as_string=True,
-    output_precision=2,
+    output_precision=DEFAULT_PRECISION,
     output_unit=None,
     ignore_modules=None,
     return_results=False,
@@ -60,6 +61,8 @@ def calculate_flops_hf(
         Default is None, that is the unit of the output decide on value.
         ignore_modules ([type], optional): the list of modules to \
         ignore during profiling. Defaults to None.
+        return_results (bool, optional): Whether to return the results. \
+        Defaults to False.
 
     Returns:
         The number of floating-point operations, \
@@ -111,23 +114,19 @@ def calculate_flops_hf(
         kwargs[key] = value.to(device)
 
     try:
-        if forward_mode == "forward":
+        if forward_mode == FORWARD_MODE:
             _ = empty_model(**kwargs)
-        if forward_mode == "generate":
+        if forward_mode == GENERATE_MODE:
             _ = empty_model.generate(**kwargs)
     except Exception as e:
-        error_info = """The model:%s encountered a problem in forwarding, 
-        perhaps because the model:%s cannot be deduced on meta device. 
+        error_info = f"""The model:{model_name} encountered a problem in forwarding, 
+        perhaps because the model cannot be deduced on meta device. 
         You can downloaded complete model parameters 
         locally from huggingface , \
         and then use the function:calflops.calculate_flops(model, tokenizer) \
-        to calculate FLOPs on the gpu device.\n
-        Error details: %s\n.
-        """ % (
-            model_name,
-            model_name,
-            e,
-        )
+        to calculate FLOPs on a GPU.\n
+        Error details: {e}\n.
+        """
         print(error_info)
         return None, None, None
     else:

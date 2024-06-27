@@ -1,6 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
 import torch
 import torch.nn as nn
 
@@ -11,6 +8,7 @@ from .utils import (
     macs_to_string,
     params_to_string,
 )
+from .constants import FORWARD_MODE, BACKPROP_FACTOR, DEFAULT_PRECISION, GENERATE_MODE
 
 
 def calculate_flops(
@@ -19,13 +17,13 @@ def calculate_flops(
     transformer_tokenizer=None,
     args=[],
     kwargs={},
-    forward_mode="forward",
+    forward_mode=FORWARD_MODE,
     include_backpropagation=False,
-    compute_bp_factor=2.0,
+    compute_bp_factor=BACKPROP_FACTOR,
     print_results=True,
     print_detailed=True,
     output_as_string=True,
-    output_precision=2,
+    output_precision=DEFAULT_PRECISION,
     output_unit=None,
     ignore_modules=None,
     is_sparse=False,
@@ -50,7 +48,7 @@ def calculate_flops(
         Defaults to 'forward'. Use 'generate' if model inference \
         uses model.generate().
         include_backpropagation (bool, optional): Decides whether the final
-        FLOPs computation includes the computation for backpropagation. \
+        FLOPs computation includes backpropagation. \
         compute_bp_factor (float, optional): The model's backpropagation \
         is a multiple of the forward propagation computation. Defaults to 2.
         print_results (bool, optional): Whether to print the model profile. \
@@ -86,6 +84,7 @@ def calculate_flops(
         compute_bp_factor=compute_bp_factor,
         is_sparse=is_sparse,
     )
+
     calculate_flops_pipeline.start_flops_calculate(ignore_list=ignore_modules)
 
     device = next(model.parameters()).device
@@ -142,12 +141,14 @@ def calculate_flops(
         for index in range(len(args)):
             args[index] = args[index].to(device)
 
-    if forward_mode == "forward":
+    if forward_mode == FORWARD_MODE:
         _ = model(*args, **kwargs)
-    elif forward_mode == "generate":
+    elif forward_mode == GENERATE_MODE:
         _ = model.generate(*args, **kwargs)
     else:
-        raise NotImplementedError("forward_mode should be either forward or generate")
+        raise NotImplementedError(
+            f"forward_mode should be either {FORWARD_MODE} or {GENERATE_MODE}"
+        )
 
     flops = calculate_flops_pipeline.get_total_flops()
     macs = calculate_flops_pipeline.get_total_macs()

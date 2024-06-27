@@ -1,6 +1,3 @@
-# !usr/bin/env python
-# -*- coding:utf-8 -*-
-
 """
 This part of the code is inspired by ptflops and deepspeed profiling.
 """
