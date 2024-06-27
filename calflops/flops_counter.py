@@ -80,13 +80,13 @@ def calculate_flops(
 
     is_transformer = True if "transformers" in str(type(model)) else False
 
-    calculate_flops_pipline = CalFlopsPipline(
+    calculate_flops_pipeline = CalFlopsPipline(
         model=model,
         include_backpropagation=include_backpropagation,
         compute_bp_factor=compute_bp_factor,
         is_sparse=is_sparse,
     )
-    calculate_flops_pipline.start_flops_calculate(ignore_list=ignore_modules)
+    calculate_flops_pipeline.start_flops_calculate(ignore_list=ignore_modules)
 
     device = next(model.parameters()).device
     model = model.to(device)
@@ -149,16 +149,16 @@ def calculate_flops(
     else:
         raise NotImplementedError("forward_mode should be either forward or generate")
 
-    flops = calculate_flops_pipline.get_total_flops()
-    macs = calculate_flops_pipline.get_total_macs()
-    params = calculate_flops_pipline.get_total_params()
+    flops = calculate_flops_pipeline.get_total_flops()
+    macs = calculate_flops_pipeline.get_total_macs()
+    params = calculate_flops_pipeline.get_total_params()
 
     if print_results:
-        calculate_flops_pipline.print_model_pipline(
+        calculate_flops_pipeline.print_model_pipline(
             units=output_unit, precision=output_precision, print_detailed=print_detailed
         )
 
-    calculate_flops_pipline.end_flops_calculate()
+    calculate_flops_pipeline.end_flops_calculate()
 
     if include_backpropagation:
         flops = flops * (1 + compute_bp_factor)
